@@ -12,6 +12,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#include "driver/gpio.h"
+
 #include "esp_log.h"
 
 #define VERSION_REQUIRED_MAJOR 1
@@ -108,7 +110,8 @@ static VL53L0X_Error WaitStopCompleted(VL53L0X_DEV Dev)
     return Status;
 }
 
-VL53L0X_Error VL53L0X_Device_init(VL53L0X_Dev_t *device)
+// new_i2c_address = 7-bit address
+VL53L0X_Error VL53L0X_Device_init(VL53L0X_Dev_t *device, uint8_t enable_gpio, uint8_t new_i2c_address)
 {
     VL53L0X_Error Status = VL53L0X_ERROR_NONE;
     VL53L0X_Dev_t *pMyDevice = device;
@@ -119,6 +122,12 @@ VL53L0X_Error VL53L0X_Device_init(VL53L0X_Dev_t *device)
     pMyDevice->comms_type = 1;
     pMyDevice->comms_speed_khz = 400;
     pMyDevice->I2cDevAddr = CONFIG_VL53L0X_I2C_ADDR;
+    
+    // Reset the chip
+    gpio_set_level(enable_gpio, 0);
+    vTaskDelay(50 / portTICK_PERIOD_MS);
+    gpio_set_level(enable_gpio, 1);
+    vTaskDelay(50 / portTICK_PERIOD_MS);
 
     Status = VL53L0X_comms_initialise(0, 400);
     if (Status != VL53L0X_ERROR_NONE)
@@ -126,6 +135,14 @@ VL53L0X_Error VL53L0X_Device_init(VL53L0X_Dev_t *device)
         VL53L0X_ErrLog("i2c init failed!");
         return Status;
     }
+    
+    Status = VL53L0X_SetDeviceAddress(pMyDevice, new_i2c_address * 2);
+    if (Status != VL53L0X_ERROR_NONE)
+    {
+        VL53L0X_ErrLog("setting i2c address failed!");
+        return Status;
+    }
+    pMyDevice->I2cDevAddr = new_i2c_address;
 
     /*
      *  Get the version of the VL53L0X API running in the firmware

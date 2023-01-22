@@ -15,7 +15,8 @@
 extern "C" {
 #endif
 
-VL53L0X_Error VL53L0X_Device_init(VL53L0X_Dev_t *device);
+// new_i2c_address = 7-bit address
+VL53L0X_Error VL53L0X_Device_init(VL53L0X_Dev_t *device, uint8_t enable_gpio, uint8_t new_i2c_address);
 VL53L0X_Error VL53L0X_Device_deinit(VL53L0X_Dev_t *device);
 VL53L0X_Error VL53L0X_Device_getMeasurement(VL53L0X_Dev_t *device, uint16_t* data);
 
