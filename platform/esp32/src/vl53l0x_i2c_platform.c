@@ -36,7 +36,7 @@ static i2c_port_t s_vl53l0x_i2c_port = CONFIG_VL53L0X_I2C_NUM;
 static int s_vl53l0x_sda_pin = CONFIG_VL53L0X_SDA_PIN;
 static int s_vl53l0x_scl_pin = CONFIG_VL53L0X_SCL_PIN;
 
-inline VL53L0X_Error esp_to_vl53l0x_error(esp_err_t esp_err)
+VL53L0X_Error esp_to_vl53l0x_error(esp_err_t esp_err)
 {
     switch (esp_err)
     {
@@ -98,6 +98,8 @@ int32_t VL53L0X_cycle_power(void)
 int32_t VL53L0X_write_multi(uint8_t address, uint8_t index, uint8_t *pdata, int32_t count)
 {
     int32_t status = STATUS_OK;
+    (void)status;
+
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
     ESP_ERROR_CHECK(i2c_master_start(cmd));
 
@@ -125,6 +127,7 @@ int32_t VL53L0X_write_multi(uint8_t address, uint8_t index, uint8_t *pdata, int3
 int32_t VL53L0X_read_multi(uint8_t address, uint8_t index, uint8_t *pdata, int32_t count)
 {
     int32_t status = STATUS_OK;
+    (void)status;
 
     // I2C write
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();

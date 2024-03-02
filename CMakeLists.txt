@@ -16,6 +16,7 @@ set(includes
 )
 
 idf_component_register(SRCS ${sources}
+                    REQUIRES driver
                     INCLUDE_DIRS ${includes})
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-Wno-maybe-uninitialized")
